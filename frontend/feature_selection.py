@@ -4,6 +4,10 @@ import numpy as np
 from sklearn.preprocessing import LabelEncoder, StandardScaler
 from sklearn.naive_bayes import GaussianNB
 from sklearn.ensemble import AdaBoostClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 def feature_selection_page():
 
@@ -64,26 +68,81 @@ def feature_selection_page():
     X = df.drop(columns=["pest"])
     y = df["pest"]
 
-    
+    # Split data into train and test sets
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
     # Scale features
     scaler = StandardScaler()
-    X_scaled = scaler.fit_transform(X)
+    X_train_scaled = scaler.fit_transform(X_train)
+    X_test_scaled = scaler.transform(X_test)
 
     # Train models
     @st.cache_resource
     def train_models():
-        print(y)
-        print(X_scaled)
+        # Train Naive Bayes
         nb_model = GaussianNB()
-        nb_model.fit(X_scaled, y)
-
-        adb_model = AdaBoostClassifier(n_estimators=100, random_state=42)
-        adb_model.fit(X_scaled, y)
+        nb_model.fit(X_train_scaled, y_train)
+        nb_train_pred = nb_model.predict(X_train_scaled)
+        nb_test_pred = nb_model.predict(X_test_scaled)
         
-        return nb_model, adb_model
+        # Train AdaBoost
+        adb_model = AdaBoostClassifier(n_estimators=100, random_state=42)
+        adb_model.fit(X_train_scaled, y_train)
+        adb_train_pred = adb_model.predict(X_train_scaled)
+        adb_test_pred = adb_model.predict(X_test_scaled)
+        
+        # Calculate metrics
+        nb_train_acc = accuracy_score(y_train, nb_train_pred)
+        nb_test_acc = accuracy_score(y_test, nb_test_pred)
+        adb_train_acc = accuracy_score(y_train, adb_train_pred)
+        adb_test_acc = accuracy_score(y_test, adb_test_pred)
+        
+        return nb_model, adb_model, {
+            'nb_train_acc': nb_train_acc,
+            'nb_test_acc': nb_test_acc,
+            'adb_train_acc': adb_train_acc,
+            'adb_test_acc': adb_test_acc,
+            'nb_test_report': classification_report(y_test, nb_test_pred),
+            'adb_test_report': classification_report(y_test, adb_test_pred),
+            'nb_conf_matrix': confusion_matrix(y_test, nb_test_pred),
+            'adb_conf_matrix': confusion_matrix(y_test, adb_test_pred)
+        }
 
-    nb_model, adb_model = train_models()
+    nb_model, adb_model, metrics = train_models()
+
+    # Display model performance metrics
+    st.subheader("Model Performance Metrics")
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.markdown("### Naive Bayes Model")
+        st.write(f"Training Accuracy: {metrics['nb_train_acc']:.2%}")
+        st.write(f"Testing Accuracy: {metrics['nb_test_acc']:.2%}")
+        st.write("Classification Report:")
+        st.text(metrics['nb_test_report'])
+        
+        # Plot confusion matrix
+        fig, ax = plt.subplots(figsize=(6, 4))
+        sns.heatmap(metrics['nb_conf_matrix'], annot=True, fmt='d', cmap='Blues')
+        plt.title('Naive Bayes Confusion Matrix')
+        plt.ylabel('True Label')
+        plt.xlabel('Predicted Label')
+        st.pyplot(fig)
+    
+    with col2:
+        st.markdown("### AdaBoost Model")
+        st.write(f"Training Accuracy: {metrics['adb_train_acc']:.2%}")
+        st.write(f"Testing Accuracy: {metrics['adb_test_acc']:.2%}")
+        st.write("Classification Report:")
+        st.text(metrics['adb_test_report'])
+        
+        # Plot confusion matrix
+        fig, ax = plt.subplots(figsize=(6, 4))
+        sns.heatmap(metrics['adb_conf_matrix'], annot=True, fmt='d', cmap='Blues')
+        plt.title('AdaBoost Confusion Matrix')
+        plt.ylabel('True Label')
+        plt.xlabel('Predicted Label')
+        st.pyplot(fig)
 
     # Create two columns for input
     col1, col2 = st.columns(2)
@@ -122,7 +181,7 @@ def feature_selection_page():
             'humidity': hum,
             'ph': ph,
             'rainfall': rainfall,
-            'GDD': GDD,  # Note: Using uppercase GDD to match training data
+            'GDD': GDD,
             'label_encoded': label_encoded,
             'district_encoded': district_encoded
         }
@@ -165,7 +224,7 @@ def feature_selection_page():
                     <p>Confidence: {results['nb_prob']:.1%}</p>
                 </div>
             """, unsafe_allow_html=True)
-        
+            st.dataframe(results)
         with col2:
             st.markdown("### AdaBoost Model")
             adb_class = "pest" if results["adb_pred"] == 1 else "no-pest"
@@ -175,6 +234,7 @@ def feature_selection_page():
                     <p>Confidence: {results['adb_prob']:.1%}</p>
                 </div>
             """, unsafe_allow_html=True)
+            st.dataframe(results)
         
         # Display GDD
         st.markdown(f"### Growing Degree Days (GDD): {results['gdd']:.1f}°C")
