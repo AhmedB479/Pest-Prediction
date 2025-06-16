@@ -2,6 +2,7 @@ import pandas as pd
 import streamlit as st
 from sklearn.preprocessing import LabelEncoder
 from feature_selection import feature_selection_page
+from model_comparison import model_comparison_page
 
 # Set page config
 st.set_page_config(
@@ -15,7 +16,7 @@ st.set_page_config(
 st.sidebar.title("Navigation")
 page = st.sidebar.radio(
     "Select a page",
-    ["🔍 Feature Selection", "📊 Data Overview"]
+    ["🔍 Feature Selection", "📊 Model Comparison", "📈 Data Overview"]
 )
 
 # Load and process data
@@ -48,11 +49,11 @@ df = load_data()
 if page == "🔍 Feature Selection":
     feature_selection_page() 
 
-
-
-elif page == "📊 Data Overview":
+elif page == "📊 Model Comparison":
+    model_comparison_page()
+elif page == "📈 Data Overview":
     # Page content based on selection
-    st.title("📊 Data Overview")
+    st.title("📈 Data Overview")
     st.markdown("### Raw Data Preview")
     st.dataframe(df)
     

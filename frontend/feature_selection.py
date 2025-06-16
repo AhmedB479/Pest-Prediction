@@ -242,7 +242,10 @@ def feature_selection_page():
         # Display results with user input
         st.subheader("Training Set Predictions with Your Input")
         train_results_with_input = pd.concat([metrics['train_results'], user_input_row])
-        st.dataframe(train_results_with_input.tail(10))
+        st.dataframe(train_results_with_input.tail(10).style.map(
+            lambda x: 'background-color: #ffebee' if x == True else '', 
+            subset=['User_Input']
+        ))
         
         # Plot distributions
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 5))
