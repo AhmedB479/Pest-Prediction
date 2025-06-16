@@ -84,18 +84,39 @@ def feature_selection_page():
         nb_model.fit(X_train_scaled, y_train)
         nb_train_pred = nb_model.predict(X_train_scaled)
         nb_test_pred = nb_model.predict(X_test_scaled)
+        nb_train_prob = nb_model.predict_proba(X_train_scaled)[:, 1]
+        nb_test_prob = nb_model.predict_proba(X_test_scaled)[:, 1]
         
         # Train AdaBoost
         adb_model = AdaBoostClassifier(n_estimators=100, random_state=42)
         adb_model.fit(X_train_scaled, y_train)
         adb_train_pred = adb_model.predict(X_train_scaled)
         adb_test_pred = adb_model.predict(X_test_scaled)
+        adb_train_prob = adb_model.predict_proba(X_train_scaled)[:, 1]
+        adb_test_prob = adb_model.predict_proba(X_test_scaled)[:, 1]
         
         # Calculate metrics
         nb_train_acc = accuracy_score(y_train, nb_train_pred)
         nb_test_acc = accuracy_score(y_test, nb_test_pred)
         adb_train_acc = accuracy_score(y_train, adb_train_pred)
         adb_test_acc = accuracy_score(y_test, adb_test_pred)
+        
+        # Create DataFrames for predictions
+        train_results = pd.DataFrame({
+            'Actual': y_train,
+            'NB_Prediction': nb_train_pred,
+            'NB_Probability': nb_train_prob,
+            'AdaBoost_Prediction': adb_train_pred,
+            'AdaBoost_Probability': adb_train_prob
+        })
+        
+        test_results = pd.DataFrame({
+            'Actual': y_test,
+            'NB_Prediction': nb_test_pred,
+            'NB_Probability': nb_test_prob,
+            'AdaBoost_Prediction': adb_test_pred,
+            'AdaBoost_Probability': adb_test_prob
+        })
         
         return nb_model, adb_model, {
             'nb_train_acc': nb_train_acc,
@@ -105,7 +126,9 @@ def feature_selection_page():
             'nb_test_report': classification_report(y_test, nb_test_pred),
             'adb_test_report': classification_report(y_test, adb_test_pred),
             'nb_conf_matrix': confusion_matrix(y_test, nb_test_pred),
-            'adb_conf_matrix': confusion_matrix(y_test, adb_test_pred)
+            'adb_conf_matrix': confusion_matrix(y_test, adb_test_pred),
+            'train_results': train_results,
+            'test_results': test_results
         }
 
     nb_model, adb_model, metrics = train_models()
@@ -142,6 +165,62 @@ def feature_selection_page():
         plt.title('AdaBoost Confusion Matrix')
         plt.ylabel('True Label')
         plt.xlabel('Predicted Label')
+        st.pyplot(fig)
+
+    # Add a new section for train-test predictions
+    st.subheader("Train-Test Predictions")
+    
+    # Create tabs for train and test predictions
+    train_tab, test_tab = st.tabs(["Training Set Predictions", "Test Set Predictions"])
+    
+    with train_tab:
+        st.markdown("### Training Set Predictions")
+        # Display sample of training predictions
+        st.write("Sample of Training Set Predictions (First 10 rows):")
+        st.dataframe(metrics['train_results'].head(10))
+        
+        # Plot training predictions distribution
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 5))
+        
+        # Naive Bayes training predictions
+        sns.histplot(data=metrics['train_results'], x='NB_Probability', hue='Actual', 
+                    bins=20, ax=ax1)
+        ax1.set_title('Naive Bayes Training Predictions Distribution')
+        ax1.set_xlabel('Prediction Probability')
+        ax1.set_ylabel('Count')
+        
+        # AdaBoost training predictions
+        sns.histplot(data=metrics['train_results'], x='AdaBoost_Probability', hue='Actual', 
+                    bins=20, ax=ax2)
+        ax2.set_title('AdaBoost Training Predictions Distribution')
+        ax2.set_xlabel('Prediction Probability')
+        ax2.set_ylabel('Count')
+        
+        st.pyplot(fig)
+    
+    with test_tab:
+        st.markdown("### Test Set Predictions")
+        # Display sample of test predictions
+        st.write("Sample of Test Set Predictions (First 10 rows):")
+        st.dataframe(metrics['test_results'].head(10))
+        
+        # Plot test predictions distribution
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 5))
+        
+        # Naive Bayes test predictions
+        sns.histplot(data=metrics['test_results'], x='NB_Probability', hue='Actual', 
+                    bins=20, ax=ax1)
+        ax1.set_title('Naive Bayes Test Predictions Distribution')
+        ax1.set_xlabel('Prediction Probability')
+        ax1.set_ylabel('Count')
+        
+        # AdaBoost test predictions
+        sns.histplot(data=metrics['test_results'], x='AdaBoost_Probability', hue='Actual', 
+                    bins=20, ax=ax2)
+        ax2.set_title('AdaBoost Test Predictions Distribution')
+        ax2.set_xlabel('Prediction Probability')
+        ax2.set_ylabel('Count')
+        
         st.pyplot(fig)
 
     # Create two columns for input
@@ -212,6 +291,20 @@ def feature_selection_page():
     if st.button("Predict Pest Infestation", type="primary"):
         results = predict_pest(temp, hum, ph, rainfall, label, district, nitrogen, phosphorus, potassium, gdd)
         
+        # Create a new row for user input
+        user_input_row = pd.DataFrame({
+            'Actual': [-1],  # Use -1 instead of None to represent user input
+            'NB_Prediction': [results["nb_pred"]],
+            'NB_Probability': [results["nb_prob"]],
+            'AdaBoost_Prediction': [results["adb_pred"]],
+            'AdaBoost_Probability': [results["adb_prob"]],
+            'User_Input': [True]  # Flag to identify user input
+        })
+        
+        # Append user input to both train and test results
+        train_results_with_input = pd.concat([metrics['train_results'], user_input_row], ignore_index=True)
+        test_results_with_input = pd.concat([metrics['test_results'], user_input_row], ignore_index=True)
+        
         # Display results in two columns
         col1, col2 = st.columns(2)
         
@@ -224,7 +317,7 @@ def feature_selection_page():
                     <p>Confidence: {results['nb_prob']:.1%}</p>
                 </div>
             """, unsafe_allow_html=True)
-            st.dataframe(results)
+        
         with col2:
             st.markdown("### AdaBoost Model")
             adb_class = "pest" if results["adb_pred"] == 1 else "no-pest"
@@ -234,8 +327,85 @@ def feature_selection_page():
                     <p>Confidence: {results['adb_prob']:.1%}</p>
                 </div>
             """, unsafe_allow_html=True)
-            st.dataframe(results)
         
         # Display GDD
         st.markdown(f"### Growing Degree Days (GDD): {results['gdd']:.1f}°C")
+        
+        # Update the train-test predictions section with user input
+        st.subheader("Train-Test Predictions with User Input")
+        
+        # Create tabs for train and test predictions
+        train_tab, test_tab = st.tabs(["Training Set Predictions", "Test Set Predictions"])
+        
+        with train_tab:
+            st.markdown("### Training Set Predictions")
+            # Display sample of training predictions with user input
+            st.write("Sample of Training Set Predictions (Last 10 rows including user input):")
+            st.dataframe(train_results_with_input.tail(10).style.applymap(
+                lambda x: 'background-color: #ffebee' if x == True else '', 
+                subset=['User_Input']
+            ))
+            
+            # Plot training predictions distribution with user input
+            fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 5))
+            
+            # Naive Bayes training predictions
+            sns.histplot(data=train_results_with_input[train_results_with_input['Actual'] != -1], 
+                        x='NB_Probability', hue='Actual', bins=20, ax=ax1)
+            # Add user input point
+            ax1.axvline(x=results["nb_prob"], color='red', linestyle='--', 
+                       label='User Input')
+            ax1.set_title('Naive Bayes Training Predictions Distribution')
+            ax1.set_xlabel('Prediction Probability')
+            ax1.set_ylabel('Count')
+            ax1.legend()
+            
+            # AdaBoost training predictions
+            sns.histplot(data=train_results_with_input[train_results_with_input['Actual'] != -1], 
+                        x='AdaBoost_Probability', hue='Actual', bins=20, ax=ax2)
+            # Add user input point
+            ax2.axvline(x=results["adb_prob"], color='red', linestyle='--', 
+                       label='User Input')
+            ax2.set_title('AdaBoost Training Predictions Distribution')
+            ax2.set_xlabel('Prediction Probability')
+            ax2.set_ylabel('Count')
+            ax2.legend()
+            
+            st.pyplot(fig)
+        
+        with test_tab:
+            st.markdown("### Test Set Predictions")
+            # Display sample of test predictions with user input
+            st.write("Sample of Test Set Predictions (Last 10 rows including user input):")
+            st.dataframe(test_results_with_input.tail(10).style.applymap(
+                lambda x: 'background-color: #ffebee' if x == True else '', 
+                subset=['User_Input']
+            ))
+            
+            # Plot test predictions distribution with user input
+            fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 5))
+            
+            # Naive Bayes test predictions
+            sns.histplot(data=test_results_with_input[test_results_with_input['Actual'] != -1], 
+                        x='NB_Probability', hue='Actual', bins=20, ax=ax1)
+            # Add user input point
+            ax1.axvline(x=results["nb_prob"], color='red', linestyle='--', 
+                       label='User Input')
+            ax1.set_title('Naive Bayes Test Predictions Distribution')
+            ax1.set_xlabel('Prediction Probability')
+            ax1.set_ylabel('Count')
+            ax1.legend()
+            
+            # AdaBoost test predictions
+            sns.histplot(data=test_results_with_input[test_results_with_input['Actual'] != -1], 
+                        x='AdaBoost_Probability', hue='Actual', bins=20, ax=ax2)
+            # Add user input point
+            ax2.axvline(x=results["adb_prob"], color='red', linestyle='--', 
+                       label='User Input')
+            ax2.set_title('AdaBoost Test Predictions Distribution')
+            ax2.set_xlabel('Prediction Probability')
+            ax2.set_ylabel('Count')
+            ax2.legend()
+            
+            st.pyplot(fig)
 
