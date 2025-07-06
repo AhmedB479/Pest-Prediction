@@ -64,7 +64,6 @@ log/
 *.pkl
 *.h5
 *.model
-*.joblib
 
 # Environment variables
 .env
