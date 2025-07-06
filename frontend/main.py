@@ -3,6 +3,7 @@ import streamlit as st
 from sklearn.preprocessing import LabelEncoder
 from feature_selection import feature_selection_page
 from model_comparison import model_comparison_page
+from advanced_pest_prediction import advanced_pest_prediction_page
 
 # Set page config
 st.set_page_config(
@@ -16,7 +17,7 @@ st.set_page_config(
 st.sidebar.title("Navigation")
 page = st.sidebar.radio(
     "Select a page",
-    ["🔍 Feature Selection", "📊 Model Comparison", "📈 Data Overview"]
+    ["🔍 Feature Selection", "📊 Model Comparison", "📈 Data Overview", "🔬 Advanced Pest Prediction"]
 )
 
 # Load and process data
@@ -66,6 +67,9 @@ elif page == "📈 Data Overview":
         st.metric("Pest Infestation Rate", f"{(df['pest'].mean() * 100):.1f}%")
     with col3:
         st.metric("Average Temperature", f"{df['temperature'].mean():.1f}°C")
+        
+elif page == "🔬 Advanced Pest Prediction":
+    advanced_pest_prediction_page()
 
 
 # Add footer

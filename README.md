@@ -81,10 +81,11 @@ streamlit run main.py
 ### Step 4: Access the Application
 - Open your web browser
 - Go to: **`http://localhost:8501`**
-- The app will automatically open with three pages:
-  - 🌾 **Feature Selection** - Make pest predictions
-  - 📊 **Model Comparison** - Compare ML models
+- The app will automatically open with four pages:
+  - 🌾 **Feature Selection** - Basic pest predictions using simple models
+  - 📊 **Model Comparison** - Compare different ML models
   - 📈 **Data Overview** - View dataset statistics
+  - 🔬 **Advanced Pest Prediction** - **NEW!** Comprehensive pest analysis using trained models
 
 ---
 
@@ -97,7 +98,8 @@ streamlit run frontend/main.py
 ### Troubleshooting Startup
 - **Port busy?** Use: `streamlit run main.py --server.port 8502`
 - **Missing modules?** Run: `pip install -r requirements.txt`
-- **Data files missing?** Ensure `data/Crop.csv` exists
+- **Data files missing?** Ensure `data/Crop.csv` and `data/final_data.xlsx` exist
+- **Model loading errors?** Ensure all 24 model files exist in `best_models/` directory
 
 ---
 
@@ -192,7 +194,11 @@ Pest-Prediction/
 │   ├── main.py                       # Main Streamlit app entry point
 │   ├── feature_selection.py          # Feature selection and prediction page
 │   ├── model_comparison.py           # Model comparison and explanation page
+│   ├── advanced_pest_prediction.py   # Advanced pest prediction with trained models
 │   └── data_work.py                 # Data processing utilities
+├── best_models/                       # Trained StackingRegressor models
+│   ├── best_model_StackingRegressor_{pest_name}.joblib # 24 trained models
+│   └── ... (24 model files total)
 ├── pest_venv/                         # Virtual environment
 ├── Copy_of_FYP_2.ipynb               # Comprehensive pest analysis notebook
 ├── data_work.ipynb                   # Basic data exploration notebook
@@ -240,6 +246,69 @@ The system evaluates models using:
 - **Feature Importance**: Bar charts showing model explanations
 - **Model Comparison**: Side-by-side performance visualization
 - **Data Distribution**: Statistical overview of dataset
+
+#### 🔬 Advanced Pest Prediction Page
+**Purpose**: Comprehensive pest prediction using trained StackingRegressor models for 24 pest targets
+
+**Key Features**:
+
+##### **📈 Train/Test Performance Analysis**
+- **Interactive Split Configuration**: Adjust test size and random state
+- **Multi-target Evaluation**: Analyze performance across all 24 pest/disease targets
+- **Comprehensive Metrics**: R², MAE, RMSE for both training and testing
+- **Overfitting Detection**: Visual analysis of model generalization
+- **Comparative Visualization**: Side-by-side train vs test performance
+
+##### **🔮 Future Predictions**
+- **Comprehensive Input System**: Organized into 5 tabs:
+  - 🌤️ **Weather**: Temperature, humidity, rainfall, wind conditions
+  - 🌱 **Soil**: Soil type, pH, moisture, nutrients
+  - 🌾 **Crop**: Variety, growth stage, age, density
+  - 📍 **Location**: District, region, geographic factors
+  - 📊 **Other**: Additional environmental and management factors
+
+- **24 Simultaneous Predictions**: All pest types and disease risks including:
+  - **Above ETL**: W.FLY, JASSID, THRIPS, M.BUG, MITES, APHIDS, DUSKY COTTON BUG, SBW, PBW, ABW, Army Worm
+  - **Below ETL**: Same pests at monitoring levels
+  - **Diseases**: CLCV (Cotton Leaf Curl Virus), WILT with spot and area percentages
+
+- **Risk Assessment**: Automatic categorization:
+  - 🔴 **High Risk**: Above ETL > 5 or Disease > 20%
+  - 🟡 **Medium Risk**: Above ETL 2-5 or Disease 10-20%
+  - 🟢 **Low Risk**: Below monitoring thresholds
+
+- **Visual Results**: Color-coded predictions with actionable insights
+
+##### **🎯 Model Interpretation**
+- **Permutation Feature Importance (PFI)**:
+  - Identifies which features drive predictions
+  - Shows feature importance with confidence intervals
+  - Ranked importance across all features
+
+- **SHAP Analysis**:
+  - Global and local explanations using XGBoost surrogate models
+  - Feature contribution analysis
+  - Model decision transparency
+
+- **LIME Explanations**:
+  - Instance-level interpretability
+  - Local feature importance for specific predictions
+  - Positive/negative feature contributions
+
+##### **📊 Feature Analysis**
+- **Statistical Summaries**: Comprehensive feature statistics
+- **Correlation Analysis**: Interactive correlation matrix
+- **Distribution Analysis**: Histograms and box plots
+- **Feature Relationships**: Identify patterns and dependencies
+
+**Models Used**:
+- **24 StackingRegressor Models**: One for each pest/disease target
+- **Ensemble Architecture**: Combines Random Forest, XGBoost, and AdaBoost
+- **Surrogate Models**: XGBoost for SHAP analysis
+
+**Data Requirements**:
+- `data/final_data.xlsx`: Main dataset with pest infestation records
+- `best_models/`: Directory containing all 24 trained models
 
 ## 📊 Data Analysis Notebooks
 
