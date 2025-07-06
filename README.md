@@ -1,24 +1,24 @@
 # Pest-Prediction
 
-A comprehensive machine learning system for predicting pest infestations in agricultural fields using ensemble methods and advanced model interpretation techniques.
+A machine learning web application for predicting pest infestations in agricultural fields using interactive Streamlit frontend and comprehensive data analysis through Jupyter notebooks.
 
 ## 🎯 Overview
 
-This project implements a multi-target regression system to predict various pest populations and disease incidences in cotton fields. The system uses ensemble learning methods including Random Forest, XGBoost, AdaBoost, and advanced ensemble techniques like Voting, Bagging, and Stacking.
+This project provides an interactive web-based system for pest prediction in cotton crops. It combines machine learning models with an intuitive Streamlit interface, allowing users to input crop conditions and receive real-time pest infestation predictions. The system includes comprehensive data analysis capabilities through Jupyter notebooks.
 
 ## 📋 Features
 
-- **Multi-target Prediction**: Predicts 24 different pest and disease targets
-- **Ensemble Learning**: Combines multiple algorithms for better performance
-- **Hyperparameter Optimization**: Automated tuning using RandomizedSearchCV
-- **Model Interpretation**: SHAP, LIME, and Permutation Feature Importance
-- **Interactive Visualizations**: Comprehensive matplotlib-based analysis tools
-- **Parallel Processing**: Efficient multi-core training and evaluation
+- **Interactive Web Interface**: Streamlit-based frontend with three main pages
+- **Real-time Prediction**: Instant pest infestation predictions based on crop conditions
+- **Multiple ML Models**: Comparison of Decision Tree, Random Forest, SVM, Naive Bayes, and AdaBoost
+- **Model Interpretability**: LIME and SHAP explanations for model predictions
+- **Data Visualization**: Interactive charts and confusion matrices
+- **Comprehensive Analysis**: Jupyter notebooks for in-depth data exploration
 
 ## 🛠️ Prerequisites
 
 - Python 3.8+
-- Required packages (see `requirements.txt`)
+- All required packages listed in `requirements.txt`
 
 ## 📦 Installation
 
@@ -44,170 +44,78 @@ This project implements a multi-target regression system to predict various pest
    pip install -r requirements.txt
    ```
 
-## 📊 Data Preparation
+## 📊 Data Requirements
 
-1. **Place your data file**:
-   - Ensure `final_data.xlsx` is in the root directory
-   - The file should contain features and target columns as specified in the code
+The project contains multiple datasets for different purposes:
 
-2. **Data structure**:
-   - Features: All columns except target variables
-   - Targets: 24 pest and disease columns (see code for exact names)
-   - Missing values are automatically filled with 0
+### **Frontend Data (Streamlit App)**:
+- **`data/Crop.csv`**: Original crop dataset with columns: nitrogen, phosphorus, potassium, temperature, humidity, ph, rainfall, label, district
+- **`data/processed_crop.csv`**: Processed dataset (automatically created by the app)
 
-## 🚀 Quick Start
+### **Notebook Analysis Data**:
+- **`data/final_data.xlsx`**: Main dataset for comprehensive pest prediction analysis (used in Copy_of_FYP_2.ipynb)
+- **`data/cotton_summary_compilation.xlsx`**: Compiled cotton field data for advanced analysis
+- **Additional processed files**: Generated during notebook execution
 
-### Complete Setup and Run (All-in-One)
+**Note**: The Streamlit frontend and Jupyter notebooks use different datasets and approaches:
+- **Frontend**: Uses synthetic pest classification based on environmental thresholds
+- **Notebooks**: Use actual pest infestation data from agricultural surveys
 
-1. **Setup Environment**:
-   ```bash
-   python -m venv pest_venv
-   pest_venv\Scripts\activate  # Windows
-   # OR
-   source pest_venv/bin/activate  # Linux/Mac
-   pip install -r requirements.txt
-   ```
+## 🚀 How to Start the Streamlit Application
 
-2. **Run Everything**:
-   ```bash
-   # Train models
-   python train_models.py
-   
-   # Launch web app
-   cd frontend
-   streamlit run main.py
-   ```
-
-3. **Access Results**:
-   - **Web App**: Open `http://localhost:8501` in your browser
-   - **Model Results**: Check CSV files in root directory
-   - **Interpretation**: Run `python model_interpretation.py` for detailed analysis
-
----
-
-## 🚀 Running the System (Detailed)
-
-Run the main training script to train all models and evaluate performance:
-
+### Step 1: Install Dependencies
 ```bash
-python train_models.py
+pip install -r requirements.txt
 ```
 
-**What this does**:
-- Trains 9 different models (RandomForest, DecisionTree, AdaBoost, SVM, KNN, XGBoost, VotingRegressor, BaggingRegressor, StackingRegressor)
-- Performs hyperparameter optimization with reduced search space
-- Evaluates models across 5 different random states
-- Saves results to CSV files
-- Generates performance summary
-
-**Output files**:
-- `{ModelName}_results.csv` - Individual model results
-- `all_model_results.csv` - Combined results
-- `model_performance_summary.csv` - Performance summary
-
-### Step 2: Model Interpretation
-
-Run the interpretation script to analyze model behavior:
-
-```bash
-python model_interpretation.py
-```
-
-**What this does**:
-- Calculates Permutation Feature Importance (PFI)
-- Generates SHAP explanations using XGBoost surrogate
-- Creates LIME explanations for sample instances
-- Provides interactive matplotlib visualizations
-
-**Interactive Menu Options**:
-1. Individual PFI plots for specific targets
-2. Individual SHAP plots for specific targets
-3. Individual LIME plots for specific targets
-4. PFI Heatmap across all targets
-5. SHAP Heatmap across all targets
-6. Top Features Summary (PFI vs SHAP comparison)
-7. All visualizations at once
-
-### Step 3: Streamlit Frontend (Interactive Web App)
-
-Launch the interactive web application for real-time pest prediction and model analysis:
-
+### Step 2: Navigate to Frontend Directory
 ```bash
 cd frontend
+```
+
+### Step 3: Launch the App
+```bash
 streamlit run main.py
 ```
 
-**What this provides**:
-- **Interactive Prediction Dashboard**: Real-time pest prediction based on input parameters
-- **Model Comparison**: Compare different ML models (Decision Tree, Random Forest, SVM)
-- **Feature Selection Analysis**: Understand which features drive predictions
-- **Model Explanations**: LIME and SHAP explanations for model interpretability
-- **Data Overview**: Interactive data exploration and statistics
+### Step 4: Access the Application
+- Open your web browser
+- Go to: **`http://localhost:8501`**
+- The app will automatically open with three pages:
+  - 🌾 **Feature Selection** - Make pest predictions
+  - 📊 **Model Comparison** - Compare ML models
+  - 📈 **Data Overview** - View dataset statistics
 
-**Frontend Features**:
-- 🌾 **Feature Selection Page**: Input crop conditions and get pest predictions
-- 📊 **Model Comparison Page**: Compare model performance with visualizations
-- 📈 **Data Overview Page**: Explore dataset statistics and distributions
+---
 
-**Access the app**: Open your browser and go to `http://localhost:8501`
+### Alternative: Run from Root Directory
+```bash
+# If you want to run from the project root
+streamlit run frontend/main.py
+```
 
-### Step 4: Jupyter Notebook Analysis (Optional)
+### Troubleshooting Startup
+- **Port busy?** Use: `streamlit run main.py --server.port 8502`
+- **Missing modules?** Run: `pip install -r requirements.txt`
+- **Data files missing?** Ensure `data/Crop.csv` exists
 
-For detailed analysis and experimentation:
+---
+
+## 🚀 Alternative: Jupyter Notebook Analysis
 
 ```bash
+# Launch Jupyter
 jupyter notebook
-```
 
-Then open:
-- `Copy_of_FYP_2.ipynb` - Main analysis notebook
-- `data_work.ipynb` - Data exploration and preprocessing
-
-## 📁 Project Structure
-
-```
-Pest-Prediction/
-├── data/                          # Data directory
-│   ├── Crop.csv                  # Original crop dataset
-│   └── processed_crop.csv        # Processed dataset for frontend
-├── frontend/                      # Streamlit web application
-│   ├── main.py                   # Main Streamlit app entry point
-│   ├── feature_selection.py      # Feature selection and prediction page
-│   ├── model_comparison.py       # Model comparison and explanation page
-│   └── data_work.py             # Data processing utilities
-├── pest_venv/                     # Virtual environment
-├── best_models/                   # Saved trained models
-├── model_interpretation_outputs/  # Interpretation results
-├── Copy_of_FYP_2.ipynb           # Main analysis notebook
-├── data_work.ipynb               # Data exploration notebook
-├── train_models.py               # Main training script
-├── model_interpretation.py       # Model interpretation script
-├── requirements.txt              # Python dependencies
-├── final_data.xlsx              # Input data file
-└── README.md                    # This file
+# Open either:
+# - Copy_of_FYP_2.ipynb (Comprehensive analysis)
+# - data_work.ipynb (Basic exploration)
 ```
 
 ## 🌐 Streamlit Frontend
 
 ### Overview
-The Streamlit frontend provides an interactive web interface for pest prediction and model analysis. It offers three main pages with different functionalities.
-
-### Setup and Installation
-
-1. **Install Streamlit** (if not already installed):
-   ```bash
-   pip install streamlit
-   ```
-
-2. **Prepare Data**:
-   - Ensure `data/Crop.csv` exists (original dataset)
-   - The app will automatically create `data/processed_crop.csv`
-
-3. **Run the Application**:
-   ```bash
-   cd frontend
-   streamlit run main.py
-   ```
+The Streamlit frontend provides three main pages for different aspects of pest prediction and analysis.
 
 ### Frontend Pages
 
@@ -221,10 +129,14 @@ The Streamlit frontend provides an interactive web interface for pest prediction
 - **Confusion Matrices**: Visual representation of model performance
 - **Probability Scores**: See prediction confidence levels
 
+**Models Used**:
+- Naive Bayes (GaussianNB)
+- AdaBoost Classifier
+
 **Usage**:
 1. Fill in the crop condition parameters
 2. Click "Predict" to get results
-3. View predictions from both Naive Bayes and AdaBoost models
+3. View predictions from both models
 4. Check model performance metrics
 
 #### 📊 Model Comparison Page
@@ -236,6 +148,11 @@ The Streamlit frontend provides an interactive web interface for pest prediction
 - **Confusion Matrices**: Visual performance comparison
 - **Model Explanations**: LIME and SHAP explanations for interpretability
 - **Interactive Instance Selection**: Choose specific test cases for explanation
+
+**Models Used**:
+- Decision Tree Classifier
+- Random Forest Classifier  
+- Support Vector Machine (SVM)
 
 **Usage**:
 1. Select a model for detailed analysis
@@ -251,178 +168,198 @@ The Streamlit frontend provides an interactive web interface for pest prediction
 - **Basic Statistics**: Total records, pest infestation rate, average temperature
 - **Data Insights**: Quick overview of dataset characteristics
 
-### Frontend Configuration
+### Data Processing Pipeline
 
-#### Customization Options
-- **Theme**: Modify CSS in each page for custom styling
-- **Models**: Add new models in `model_comparison.py`
-- **Features**: Extend input parameters in `feature_selection.py`
-- **Visualizations**: Customize plots and charts
+The frontend automatically processes data through these steps:
 
-#### Data Requirements
-The frontend expects:
-- `data/Crop.csv`: Original dataset with columns: nitrogen, phosphorus, potassium, temperature, humidity, ph, rainfall, label, district
-- Automatic processing creates additional features (GDD, pest classification)
+1. **Load Original Data**: Reads `data/Crop.csv`
+2. **Feature Engineering**: 
+   - Encodes categorical variables (label, district)
+   - Creates synthetic 'pest' column based on humidity > 80% and temperature > 25°C
+   - Calculates Growing Degree Days (GDD) with base temperature of 10°C
+3. **Save Processed Data**: Creates `data/processed_crop.csv`
 
-#### Performance Optimization
-- **Caching**: Uses `@st.cache_data` and `@st.cache_resource` for efficient data loading
-- **Parallel Processing**: Model training is cached for faster subsequent runs
-- **Responsive Design**: Optimized for different screen sizes
+## 📁 Project Structure
 
-### Troubleshooting Frontend Issues
-
-#### Common Problems
-
-1. **Data File Not Found**:
-   ```
-   FileNotFoundError: data/Crop.csv
-   ```
-   **Solution**: Ensure `data/Crop.csv` exists in the correct location
-
-2. **Streamlit Not Installed**:
-   ```
-   ModuleNotFoundError: No module named 'streamlit'
-   ```
-   **Solution**: `pip install streamlit`
-
-3. **Port Already in Use**:
-   ```
-   Port 8501 is already in use
-   ```
-   **Solution**: Use `streamlit run main.py --server.port 8502`
-
-4. **Model Loading Issues**:
-   ```
-   Error loading models
-   ```
-   **Solution**: Ensure all required packages are installed and data is properly formatted
-
-#### Advanced Configuration
-
-**Custom Port**:
-```bash
-streamlit run main.py --server.port 8502
+```
+Pest-Prediction/
+├── data/                              # Data directory
+│   ├── Crop.csv                      # Frontend: Original crop dataset
+│   ├── processed_crop.csv            # Frontend: Processed dataset (auto-generated)
+│   ├── final_data.xlsx               # Notebooks: Main pest prediction dataset
+│   └── cotton_summary_compilation.xlsx # Notebooks: Cotton field compilation data
+├── frontend/                          # Streamlit web application
+│   ├── main.py                       # Main Streamlit app entry point
+│   ├── feature_selection.py          # Feature selection and prediction page
+│   ├── model_comparison.py           # Model comparison and explanation page
+│   └── data_work.py                 # Data processing utilities
+├── pest_venv/                         # Virtual environment
+├── Copy_of_FYP_2.ipynb               # Comprehensive pest analysis notebook
+├── data_work.ipynb                   # Basic data exploration notebook
+├── requirements.txt                  # Python dependencies
+└── README.md                        # This file
 ```
 
-**Custom Theme**:
-```bash
-streamlit run main.py --theme.base light
-```
+## 🔧 Technical Details
 
-**Enable Debug Mode**:
-```bash
-streamlit run main.py --logger.level debug
-```
+### Machine Learning Models
 
-### Frontend Dependencies
+**Feature Selection Page**:
+- **Naive Bayes**: GaussianNB with StandardScaler preprocessing
+- **AdaBoost**: AdaBoostClassifier with 100 estimators
 
-The frontend requires these additional packages:
-```
-streamlit>=1.28.0
-seaborn>=0.12.0
-lime>=0.2.0.1
-shap>=0.42.0
-```
+**Model Comparison Page**:
+- **Decision Tree**: DecisionTreeClassifier with random_state=42
+- **Random Forest**: RandomForestClassifier with random_state=42
+- **SVM**: SVC with probability=True, wrapped in StandardScaler pipeline
 
-Add to your `requirements.txt`:
-```txt
-streamlit>=1.28.0
-seaborn>=0.12.0
-lime>=0.2.0.1
-shap>=0.42.0
-```
+### Model Interpretability
 
-## 🔧 Configuration
+**LIME (Local Interpretable Model-agnostic Explanations)**:
+- Explains individual predictions
+- Shows feature contributions for specific samples
+- Available for all models in comparison page
 
-### Model Parameters
+**SHAP (SHapley Additive exPlanations)**:
+- Provides global and local feature importance
+- Uses TreeExplainer for Random Forest
+- Generates decision plots for model understanding
 
-The system uses optimized hyperparameter grids:
-
-- **RandomForest**: n_estimators [100, 200], max_depth [10, None]
-- **XGBoost**: n_estimators [100, 200], max_depth [3, 5], learning_rate [0.05, 0.1]
-- **Ensemble Methods**: Pre-configured with best-performing base models
-
-### Training Settings
-
-- **Test Size**: 30% (0.3)
-- **Cross-validation**: 3 folds
-- **Random States**: [0, 21, 42, 77, 101] for robust evaluation
-- **Hyperparameter Search**: 5 iterations (optimized for speed)
-
-## 📈 Performance Metrics
+### Performance Metrics
 
 The system evaluates models using:
-- **R² Score**: Coefficient of determination
-- **MAE**: Mean Absolute Error
-- **RMSE**: Root Mean Square Error
+- **Accuracy Score**: Overall classification accuracy
+- **Classification Report**: Precision, recall, F1-score
+- **Confusion Matrix**: Visual representation of predictions vs actual
+- **ROC-AUC**: Area under the ROC curve (where applicable)
 
 ## 🎨 Visualization Features
 
-### Model Interpretation Visualizations
+- **Interactive Charts**: Real-time updates based on user input
+- **Confusion Matrices**: Heatmap visualizations using seaborn
+- **Feature Importance**: Bar charts showing model explanations
+- **Model Comparison**: Side-by-side performance visualization
+- **Data Distribution**: Statistical overview of dataset
 
-1. **Permutation Feature Importance (PFI)**:
-   - Shows feature importance by permuting values
-   - Robust to feature correlations
+## 📊 Data Analysis Notebooks
 
-2. **SHAP (SHapley Additive exPlanations)**:
-   - Uses XGBoost surrogate model
-   - Provides local and global feature importance
+### Copy_of_FYP_2.ipynb
+**Purpose**: Comprehensive pest prediction analysis using actual agricultural data
 
-3. **LIME (Local Interpretable Model-agnostic Explanations)**:
-   - Explains individual predictions
-   - Shows feature contributions for specific samples
+**Key Features**:
+- **Real Pest Data**: Uses `final_data.xlsx` with actual pest infestation records
+- **Multi-target Prediction**: Predicts multiple pest species and disease conditions
+- **Advanced Models**: Implements ensemble methods and hyperparameter tuning
+- **Comprehensive Analysis**: Feature engineering, model evaluation, and interpretation
 
-### Interactive Features
+**Data Source**: `data/final_data.xlsx` and `data/cotton_summary_compilation.xlsx`
 
-- **Heatmaps**: Compare feature importance across all targets
-- **Bar Charts**: Top features for each method
-- **Comparison Plots**: PFI vs SHAP side-by-side analysis
-- **Customizable Views**: Control number of features displayed
+### data_work.ipynb  
+**Purpose**: Basic data exploration and simple classification
+
+**Key Features**:
+- **Exploratory Analysis**: Basic statistics and data visualization
+- **Simple Classification**: Binary pest/no-pest classification
+- **Data Processing**: Preprocessing steps and feature selection
+- **Baseline Models**: Simple machine learning approaches
+
+**Data Source**: Various datasets including processed versions
+
+### Key Differences
+
+| Aspect | Copy_of_FYP_2.ipynb | data_work.ipynb |
+|--------|---------------------|-----------------|
+| **Complexity** | Advanced, production-ready | Basic, exploratory |
+| **Data** | Real agricultural pest data | Simplified datasets |
+| **Models** | Ensemble methods, hyperparameter tuning | Basic classifiers |
+| **Targets** | Multi-target pest prediction | Binary classification |
+| **Purpose** | Comprehensive analysis | Learning and exploration |
+
+**Recommendation**: 
+- Use **Copy_of_FYP_2.ipynb** for serious pest prediction analysis
+- Use **data_work.ipynb** for understanding basics and data exploration
+- Use **Streamlit frontend** for interactive predictions and demonstrations
 
 ## 🐛 Troubleshooting
 
 ### Common Issues
 
-1. **Missing data file**:
+1. **Missing Data File**:
+   ```
+   FileNotFoundError: data/Crop.csv
+   ```
+   **Solution**: Ensure `data/Crop.csv` exists with the correct column structure
+
+2. **Streamlit Not Starting**:
+   ```
+   ModuleNotFoundError: No module named 'streamlit'
+   ```
+   **Solution**: Install requirements: `pip install -r requirements.txt`
+
+3. **Port Already in Use**:
+   ```
+   Port 8501 is already in use
+   ```
+   **Solution**: Use custom port: `streamlit run main.py --server.port 8502`
+
+4. **Data Processing Errors**:
+   ```
+   KeyError: 'label' or 'district'
+   ```
+   **Solution**: Verify CSV file has required columns: nitrogen, phosphorus, potassium, temperature, humidity, ph, rainfall, label, district
+
+5. **Notebook Data File Issues**:
    ```
    FileNotFoundError: final_data.xlsx
    ```
-   **Solution**: Ensure `final_data.xlsx` is in the root directory
+   **Solution**: Ensure Excel files (`final_data.xlsx`, `cotton_summary_compilation.xlsx`) exist in `data/` directory
 
-2. **Missing models**:
+6. **Excel File Dependencies**:
    ```
-   FileNotFoundError: best_models/best_model_*.joblib
+   ImportError: Missing optional dependency 'openpyxl'
    ```
-   **Solution**: Run `train_models.py` first to generate models
-
-3. **Memory issues**:
-   ```
-   MemoryError during training
-   ```
-   **Solution**: Reduce `n_iter` in RandomizedSearchCV or use smaller dataset
-
-4. **Package conflicts**:
-   ```
-   ImportError: No module named 'shap'
-   ```
-   **Solution**: Reinstall requirements: `pip install -r requirements.txt`
+   **Solution**: Install Excel support: `pip install openpyxl xlrd`
 
 ### Performance Optimization
 
-- **Faster training**: Reduce `n_iter` in hyperparameter search
-- **Memory efficient**: Use smaller subset of data for testing
-- **Parallel processing**: Already enabled with `n_jobs=-1`
+- **Caching**: Streamlit uses `@st.cache_data` and `@st.cache_resource` for efficient data loading
+- **Model Training**: Models are cached after first training
+- **Data Processing**: Processed data is saved for reuse
 
-## 📊 Expected Outputs
+## 📋 Requirements
 
-### Training Results
-- Individual model performance CSV files
-- Combined results summary
-- Model performance ranking
+The system requires these main packages:
+- `streamlit>=1.45.1` - Web interface
+- `pandas>=2.3.0` - Data manipulation
+- `scikit-learn>=1.7.0` - Machine learning models
+- `matplotlib>=3.10.3` - Plotting
+- `seaborn>=0.13.2` - Statistical visualization
+- `lime>=0.2.0.1` - Model interpretability
+- `shap>=0.48.0` - Model explanations
 
-### Interpretation Results
-- PFI plots for each target
-- SHAP summary plots
-- LIME HTML explanations
-- Interactive matplotlib visualizations
+## 🚀 Getting Started Steps
+
+1. **Install dependencies**: `pip install -r requirements.txt`
+2. **Prepare data**: Ensure `data/Crop.csv` exists
+3. **Launch app**: `cd frontend && streamlit run main.py`
+4. **Access interface**: Open `http://localhost:8501`
+5. **Start predicting**: Use the Feature Selection page for predictions
+6. **Explore models**: Use Model Comparison page for detailed analysis
+
+## 🔬 For Data Scientists
+
+To extend or modify the system:
+
+1. **Add new models**: Edit `feature_selection.py` or `model_comparison.py`
+2. **Modify features**: Update data processing in `main.py`
+3. **Add visualizations**: Extend plotting functions in respective page files
+4. **Enhance interpretability**: Add new explanation methods to comparison page
+
+## 📄 License
+
+This project is designed for educational and research purposes. Please validate predictions with domain experts before making agricultural decisions.
+
+---
+
+**Note**: This system creates synthetic pest labels based on temperature and humidity thresholds. For production use, replace with actual pest infestation data.
 
